@@ -1,0 +1,149 @@
+<style>
+  :root {
+    --bg: #f3f7fb;
+    --panel: #ffffff;
+    --line: #d9e2ec;
+    --text: #132238;
+    --muted: #5b6b7f;
+    --primary: #2f6fed;
+    --shadow: 0 10px 24px rgba(17, 37, 68, 0.08);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    min-height: 100%;
+    background: var(--bg);
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--text);
+  }
+
+  .admin-shell {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    min-height: 100vh;
+  }
+
+  .sidebar {
+    background: #10233f;
+    color: #fff;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .brand h1 {
+    margin: 0 0 8px;
+    font-size: 24px;
+    line-height: 1.1;
+  }
+
+  .brand p {
+    margin: 0;
+    color: rgba(255,255,255,0.75);
+    font-size: 14px;
+  }
+
+  .menu-btn, .action-btn, .action-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    border: none;
+    border-radius: 14px;
+    padding: 14px 16px;
+    font-weight: 800;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .menu-btn {
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+  }
+
+  .menu-btn.active {
+    background: #fff;
+    color: #10233f;
+  }
+
+  .sidebar-actions {
+    margin-top: auto;
+    display: grid;
+    gap: 10px;
+  }
+
+  .action-btn.primary {
+    background: var(--primary);
+    color: #fff;
+  }
+
+  .action-btn.secondary {
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+  }
+
+  .action-link {
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+  }
+
+  .content {
+    padding: 24px;
+    display: grid;
+    gap: 18px;
+    align-content: start;
+  }
+
+  .topbar {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+    border-radius: 18px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .topbar h2, .card-section h3 {
+    margin: 0 0 6px;
+  }
+
+  .topbar p {
+    margin: 0;
+    color: var(--muted);
+  }
+
+  .card-section {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+    border-radius: 18px;
+    padding: 18px;
+  }
+
+  .hidden { display: none; }
+
+  .editor textarea {
+    width: 100%;
+    min-height: 400px;
+    resize: vertical;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    padding: 14px;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #1d2939;
+    background: #fbfdff;
+  }
+
+  @media (max-width: 900px) {
+    .admin-shell { grid-template-columns: 1fr; }
+    .sidebar { position: sticky; top: 0; z-index: 2; }
+  }
+</style>
