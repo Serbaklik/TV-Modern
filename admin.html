@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin TV Digital</title>
+  <?!= include('admin_styles'); ?>
+</head>
+<body>
+  <div class="admin-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>ADMIN TV DIGITAL</h1>
+        <p>Kontrol sederhana berbasis Google Sheets</p>
+      </div>
+
+      <button class="menu-btn active" data-target="settings-box">Settings</button>
+      <button class="menu-btn" data-target="promos-box">Promo</button>
+      <button class="menu-btn" data-target="queues-box">Antrian</button>
+      <button class="menu-btn" data-target="services-box">Layanan</button>
+
+      <div class="sidebar-actions">
+        <button id="reload-btn" class="action-btn secondary">Muat Ulang Data</button>
+        <a class="action-link" href="?">Buka Dashboard</a>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="topbar">
+        <div>
+          <h2>Panel Kontrol</h2>
+          <p>Edit data lalu simpan ke sheet.</p>
+        </div>
+        <button id="save-all-btn" class="action-btn primary">Simpan Semua</button>
+      </div>
+
+      <section id="settings-box" class="card-section">
+        <h3>Settings</h3>
+        <div class="editor">
+          <textarea id="settings-json"></textarea>
+        </div>
+      </section>
+
+      <section id="promos-box" class="card-section hidden">
+        <h3>Promo Items</h3>
+        <div class="editor">
+          <textarea id="promos-json"></textarea>
+        </div>
+      </section>
+
+      <section id="queues-box" class="card-section hidden">
+        <h3>Queue List</h3>
+        <div class="editor">
+          <textarea id="queues-json"></textarea>
+        </div>
+      </section>
+
+      <section id="services-box" class="card-section hidden">
+        <h3>Services</h3>
+        <div class="editor">
+          <textarea id="services-json"></textarea>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <?!= include('admin_script'); ?>
+</body>
+</html>
