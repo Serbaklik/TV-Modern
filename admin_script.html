@@ -1,0 +1,75 @@
+<script>
+  window.ADMIN_DATA = <?= JSON.stringify(appData || {}) ?>;
+
+  const els = {
+    settings: document.getElementById('settings-json'),
+    promos: document.getElementById('promos-json'),
+    queues: document.getElementById('queues-json'),
+    services: document.getElementById('services-json'),
+    saveBtn: document.getElementById('save-all-btn'),
+    reloadBtn: document.getElementById('reload-btn'),
+    menuBtns: Array.from(document.querySelectorAll('.menu-btn'))
+  };
+
+  function pretty(obj) {
+    return JSON.stringify(obj, null, 2);
+  }
+
+  function fillEditors(data) {
+    els.settings.value = pretty(data.settings || {});
+    els.promos.value = pretty(data.promos || []);
+    els.queues.value = pretty(data.queues || []);
+    els.services.value = pretty(data.services || []);
+  }
+
+  function parseJson(text, fallback) {
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      return fallback;
+    }
+  }
+
+  function saveAll() {
+    const settingsObj = parseJson(els.settings.value, {});
+    const settingsArr = Object.keys(settingsObj || {}).map(k => ({ key: k, value: settingsObj[k] }));
+
+    const payload = {
+      settings: settingsArr,
+      promos: parseJson(els.promos.value, []),
+      queues: parseJson(els.queues.value, []),
+      services: parseJson(els.services.value, [])
+    };
+
+    google.script.run.withSuccessHandler(function(resp) {
+      if (resp && resp.ok) {
+        fillEditors(resp.data);
+        alert('Data berhasil disimpan ke sheet.');
+      } else {
+        alert('Gagal menyimpan data.');
+      }
+    }).saveAdminData(payload);
+  }
+
+  function reloadAll() {
+    google.script.run.withSuccessHandler(function(data) {
+      fillEditors(data);
+      alert('Data berhasil dimuat ulang.');
+    }).getAdminData();
+  }
+
+  function switchSection(targetId) {
+    document.querySelectorAll('.card-section').forEach(sec => sec.classList.add('hidden'));
+    document.getElementById(targetId).classList.remove('hidden');
+    els.menuBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.target === targetId));
+  }
+
+  function init() {
+    fillEditors(window.ADMIN_DATA || {});
+    els.saveBtn.addEventListener('click', saveAll);
+    els.reloadBtn.addEventListener('click', reloadAll);
+    els.menuBtns.forEach(btn => btn.addEventListener('click', () => switchSection(btn.dataset.target)));
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+</script>
