@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard TV Digital</title>
+  <?!= include('styles'); ?>
+</head>
+<body>
+  <div class="screen">
+    <header class="header">
+      <h1 id="dashboard-title"><?= appData.settings.dashboard_title || 'DASBORD APOTEK DIGITAL' ?></h1>
+    </header>
+
+    <main class="grid">
+      <section class="panel">
+        <div class="panel-inner promo-shell">
+          <h2 class="panel-title" id="promo-title"><?= appData.settings.promo_title || 'PROMOSIANA SLIDE ARAI PRODUK UNGGULAN' ?></h2>
+
+          <div class="carousel">
+            <button class="nav-btn left" aria-label="Sebelumnya" type="button">‹</button>
+            <div class="carousel-track" id="promo-track"></div>
+            <button class="nav-btn right" aria-label="Berikutnya" type="button">›</button>
+          </div>
+
+          <div class="dots" id="promo-dots"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-inner queue-shell">
+          <h2 class="panel-title" id="queue-title"><?= appData.settings.queue_title || 'ANTRIAN RESEP' ?></h2>
+          <div class="queue-header">
+            <span>No. Antrian</span>
+            <span>Status</span>
+          </div>
+          <div class="queue-list" id="queue-list"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-inner services-shell">
+          <h2 class="panel-title" id="services-title"><?= appData.settings.services_title || 'INFO LAYANAN KAMI' ?></h2>
+          <div class="service-list" id="service-list"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <?!= include('script'); ?>
+</body>
+</html>
