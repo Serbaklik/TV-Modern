@@ -1,0 +1,167 @@
+<script>
+  window.APP_DATA = <?= JSON.stringify(appData || {}) ?>;
+
+  const state = {
+    promoIndex: 0,
+    data: window.APP_DATA || {},
+    slideMs: Number((window.APP_DATA.settings && window.APP_DATA.settings.carousel_interval) || 3500),
+    refreshMs: Number((window.APP_DATA.settings && window.APP_DATA.settings.refresh_interval) || 10000),
+    refreshTimer: null,
+    slideTimer: null
+  };
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function renderPromos(promos) {
+    const track = document.getElementById('promo-track');
+    const dots = document.getElementById('promo-dots');
+    if (!track) return;
+
+    const items = Array.isArray(promos) ? promos : [];
+    if (!items.length) {
+      track.innerHTML = `
+        <article class="promo-card"><div class="promo-media"><div class="product-illustration"><div class="promo-placeholder">TAMBAHKAN DATA PROMO</div></div></div><div class="promo-info"><div class="promo-name">PROMO 1</div><div class="promo-price">Rp 0</div></div></article>
+        <article class="promo-card"><div class="promo-media blue"><div class="product-illustration"><div class="promo-placeholder">PROMO 2</div></div></div><div class="promo-info"><div class="promo-name">PROMO 2</div><div class="promo-price">Rp 0</div></div></article>
+      `;
+      if (dots) dots.innerHTML = '<span class="dot active"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>';
+      return;
+    }
+
+    const a = items[state.promoIndex % items.length];
+    const b = items[(state.promoIndex + 1) % items.length];
+    const pair = [a, b];
+
+    track.innerHTML = pair.map((p, idx) => `
+      <article class="promo-card">
+        <div class="promo-media ${idx % 2 === 1 ? 'blue' : ''}">
+          <div class="product-illustration">
+            ${p.image_url ? `<img class="promo-image" src="${escapeHtml(p.image_url)}" alt="${escapeHtml(p.title || '')}">` : `<div class="promo-placeholder">${escapeHtml(p.title || 'PROMO')}</div>`}
+          </div>
+        </div>
+        <div class="promo-info">
+          ${p.badge ? `<div class="promo-badge">${escapeHtml(p.badge)}</div>` : ''}
+          <div class="promo-name">${escapeHtml(p.title || '')}</div>
+          <div class="promo-price">${escapeHtml(p.price || '')}</div>
+        </div>
+      </article>
+    `).join('');
+
+    if (dots) {
+      dots.innerHTML = '';
+      for (let i = 0; i < Math.min(4, Math.max(items.length, 4)); i++) {
+        const span = document.createElement('span');
+        span.className = 'dot' + (i === (state.promoIndex % 4) ? ' active' : '');
+        dots.appendChild(span);
+      }
+    }
+  }
+
+  function renderQueues(queues) {
+    const list = document.getElementById('queue-list');
+    if (!list) return;
+    const items = Array.isArray(queues) ? queues.slice(0, 5) : [];
+    list.innerHTML = items.length ? items.map(item => {
+      const statusClass = (item.status_code || 'waiting').toLowerCase();
+      const icon = item.icon || (statusClass === 'ready' ? '✓' : statusClass === 'processing' ? '◔' : '⌛');
+      return `
+        <div class="queue-row ${statusClass}">
+          <div class="queue-no">${escapeHtml(item.queue_no || '-')}</div>
+          <div class="queue-status"><span>|</span>${escapeHtml(item.status_text || '')}</div>
+          <div class="queue-ico">${escapeHtml(icon)}</div>
+        </div>
+      `;
+    }).join('') : `
+      <div class="queue-row waiting">
+        <div class="queue-no">-</div>
+        <div class="queue-status"><span>|</span>BELUM ADA DATA</div>
+        <div class="queue-ico">⌛</div>
+      </div>
+    `;
+  }
+
+  function renderServices(services) {
+    const list = document.getElementById('service-list');
+    if (!list) return;
+    const items = Array.isArray(services) ? services.slice(0, 3) : [];
+    list.innerHTML = items.length ? items.map(svc => `
+      <article class="service-card">
+        <div class="service-icon" aria-hidden="true">★</div>
+        <div class="service-label">${escapeHtml(svc.service_title || '')}</div>
+      </article>
+    `).join('') : `
+      <article class="service-card">
+        <div class="service-icon" aria-hidden="true">★</div>
+        <div class="service-label">TAMBAHKAN DATA LAYANAN DI SHEET</div>
+      </article>
+    `;
+  }
+
+  function applySettings(settings) {
+    const title = document.getElementById('dashboard-title');
+    const promoTitle = document.getElementById('promo-title');
+    const queueTitle = document.getElementById('queue-title');
+    const servicesTitle = document.getElementById('services-title');
+
+    if (title) title.textContent = settings.dashboard_title || 'DASBORD APOTEK DIGITAL';
+    if (promoTitle) promoTitle.textContent = settings.promo_title || 'PROMOSIANA SLIDE ARAI PRODUK UNGGULAN';
+    if (queueTitle) queueTitle.textContent = settings.queue_title || 'ANTRIAN RESEP';
+    if (servicesTitle) servicesTitle.textContent = settings.services_title || 'INFO LAYANAN KAMI';
+  }
+
+  function renderAll(data) {
+    state.data = data || {};
+    applySettings(state.data.settings || {});
+    state.slideMs = Number((state.data.settings && state.data.settings.carousel_interval) || state.slideMs || 3500);
+    state.refreshMs = Number((state.data.settings && state.data.refresh_interval) || state.refreshMs || 10000);
+    renderPromos(state.data.promos || []);
+    renderQueues(state.data.queues || []);
+    renderServices(state.data.services || []);
+  }
+
+  function nextPromo() {
+    if (!state.data.promos || !state.data.promos.length) return;
+    state.promoIndex = (state.promoIndex + 1) % state.data.promos.length;
+    renderPromos(state.data.promos);
+  }
+
+  function prevPromo() {
+    if (!state.data.promos || !state.data.promos.length) return;
+    state.promoIndex = (state.promoIndex - 1 + state.data.promos.length) % state.data.promos.length;
+    renderPromos(state.data.promos);
+  }
+
+  function loadFreshData() {
+    google.script.run.withSuccessHandler(function(data) {
+      renderAll(data);
+    }).getDashboardData();
+  }
+
+  function wireButtons() {
+    const left = document.querySelector('.nav-btn.left');
+    const right = document.querySelector('.nav-btn.right');
+    if (left) left.addEventListener('click', prevPromo);
+    if (right) right.addEventListener('click', nextPromo);
+  }
+
+  function startTimers() {
+    if (state.slideTimer) clearInterval(state.slideTimer);
+    if (state.refreshTimer) clearInterval(state.refreshTimer);
+    state.slideTimer = setInterval(nextPromo, state.slideMs);
+    state.refreshTimer = setInterval(loadFreshData, state.refreshMs);
+  }
+
+  function init() {
+    wireButtons();
+    renderAll(state.data);
+    startTimers();
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+</script>
